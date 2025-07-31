@@ -1,231 +1,214 @@
-# Unity Game Dev Agents 🎮
+# Unity Claude Agents - Unity Game Development AI Team 🎮
 
-**A specialized collection of Unity development AI agents for Claude Code**
+**Supercharge Claude Code with a team of specialized Unity AI agents** that work together to build complete game features, optimize performance, and handle any Unity development challenge with expert-level knowledge.
 
-> **⚡ Built for Claude Code**: These agents are optimized for Claude Code's agent orchestration system, providing expert Unity development assistance through specialized AI agents that work together as a cohesive team.
+## ⚠️ Important Notice
 
-## 🚀 Quick Start
+**This project is experimental and token-intensive.** Unity game development involves complex multi-system interactions. Multi-agent orchestration can consume 10-50k tokens per complex feature. Use with caution and monitor your usage.
+
+## 🚀 Quick Start (3 Minutes)
 
 ### Prerequisites
-- [Claude Code](https://claude.ai/code) CLI installed
-- Unity 2022.3 LTS or later (Unity 6000.1+ recommended)
-- Basic familiarity with Unity development
+- **Claude Code CLI** installed and authenticated
+- **Claude subscription** - required for intensive agent workflows
+- **Unity 2022.3 LTS or later** (Unity 6000.1+ recommended)
+- Active Unity project directory
 
-### Installation
-
-**Option 1: Direct Download (Recommended)**
+### 1. Install the Agents
 ```bash
-# Download the team configuration to your Unity project root
-curl -L -o CLAUDE.md https://raw.githubusercontent.com/the1-unity-claude-agents/main/unity-game-dev-agents/CLAUDE.md
+git clone https://github.com/The1Studio/the1-unity-claude-agents.git
 ```
 
-**Option 2: Clone Repository**
+#### Option A: Symlink (Recommended - auto-updates)
+
+**macOS/Linux:**
 ```bash
-git clone https://github.com/the1-unity-claude-agents/unity-game-dev-agents.git
-cd unity-game-dev-agents
-cp unity-game-dev-agents/CLAUDE.md /path/to/your/unity/project/
+ln -sf "$(pwd)/the1-unity-claude-agents" ~/.claude/the1-unity-claude-agents
 ```
 
-**Option 3: Manual Setup**
-1. Download [`CLAUDE.md`](./unity-game-dev-agents/CLAUDE.md)
-2. Place it in your Unity project root directory (same level as Assets/)
-3. Open Claude Code in your Unity project directory
-
-### First Steps
-
-1. **Initialize your AI team:**
-   ```
-   "Analyze my Unity project and configure the development team"
-   ```
-
-2. **Start building:**
-   ```
-   "Create a player controller with smooth movement and jumping"
-   ```
-
-The `unity-tech-lead-orchestrator` will automatically:
-- ✅ Detect your Unity version and render pipeline
-- ✅ Analyze your project structure
-- ✅ Route tasks to appropriate specialists
-- ✅ Coordinate implementation across agents
-
-## 🤖 Meet Your Unity AI Team
-
-This collection includes **40+ specialized agents** organized into strategic teams:
-
-### 🏗️ **Orchestrators**
-- **unity-tech-lead-orchestrator** - Main coordinator and task router
-- **unity-project-analyst** - Project analysis and technology detection
-- **unity-team-configurator** - Team setup based on project needs
-
-### 🎮 **Core Development**
-- **unity-performance-optimizer** - Performance profiling and optimization
-- **unity-qa-engineer** - Automated testing and quality assurance
-- **unity-analytics-engineer** - Game analytics and telemetry
-- **unity-tools-programmer** - Editor tools and workflow automation
-- **unity-build-engineer** - Build pipelines and CI/CD
-
-### 🎯 **Specialized Experts**
-
-**Gameplay Programming**
-- unity-gameplay-programmer, unity-physics-programmer, unity-ai-programmer, unity-animation-programmer
-
-**Graphics & Rendering**
-- unity-graphics-programmer, unity-shader-programmer, unity-technical-artist
-
-**Platform Development**
-- unity-mobile-developer, unity-console-developer, unity-web-developer, unity-vr-developer, unity-ar-developer
-
-**Backend & Infrastructure**
-- unity-multiplayer-engineer, unity-cloud-engineer, unity-data-engineer, unity-security-engineer
-
-**Business & Accessibility**
-- unity-monetization-specialist, unity-localization-specialist, unity-accessibility-specialist
-
-[**→ View all agents**](./unity-game-dev-agents/README.md#-your-unity-ai-team-40-specialists)
-
-## ✨ How It Works
-
-### Intelligent Orchestration
-Unlike single AI assistants, this system uses **intelligent task routing**:
-
-1. **unity-tech-lead-orchestrator** receives your request
-2. Analyzes the task complexity and requirements
-3. Routes work to appropriate Unity specialists
-4. Coordinates implementation across multiple agents
-5. Ensures Unity best practices and performance optimization
-
-### Example Workflow
-```
-You: "Create a multiplayer racing game for mobile"
-
-unity-tech-lead-orchestrator coordinates:
-├── unity-mobile-developer: Platform optimization
-├── unity-multiplayer-engineer: Netcode implementation  
-├── unity-physics-programmer: Vehicle physics
-├── unity-performance-optimizer: Mobile performance
-└── unity-monetization-specialist: IAP integration
+**Windows (PowerShell):**
+```powershell
+cmd /c mklink /D "$env:USERPROFILE\.claude\the1-unity-claude-agents" "$(Get-Location)\the1-unity-claude-agents"
 ```
 
-## 🎯 Key Features
-
-- **🎮 Unity 6000.1 Optimized**: Latest Unity APIs and best practices
-- **⚡ Performance-First**: Built-in optimization for all target platforms
-- **🧠 Intelligent Routing**: Automatic task distribution to specialists
-- **🔧 Production-Ready**: Based on shipped game development experience
-- **📱 Multi-Platform**: Mobile, console, web, and XR support
-- **🤝 Team Coordination**: Agents work together seamlessly
-
-## 📚 Documentation
-
-- **[Setup Guide](./unity-game-dev-agents/README.md#-quick-setup)** - Detailed installation and configuration
-- **[Agent Directory](./unity-game-dev-agents/AGENT_DIRECTORY.md)** - Complete list of all agents
-- **[Best Practices](./unity-game-dev-agents/docs/best-practices.md)** - Tips for optimal results
-- **[Example Workflows](./unity-game-dev-agents/docs/example-workflows.md)** - Common development scenarios
-- **[Creating Agents](./unity-game-dev-agents/docs/creating-agents.md)** - Guide for contributing new agents
-
-## 🚀 Example Use Cases
-
-### 🎮 Game Development
+#### Option B: Copy (Static - no auto-updates)
 ```bash
-# Complete game features
-"Implement an inventory system with drag-and-drop UI"
-"Add AI enemies with behavior trees and pathfinding" 
-"Create a multiplayer lobby system with matchmaking"
-
-# Performance optimization
-"Optimize my game for 60fps on mobile devices"
-"Reduce draw calls and improve rendering performance"
-"Profile and fix memory leaks in my game"
+cp -r the1-unity-claude-agents ~/.claude/
 ```
 
-### 🛠️ Development Tools
+### 2. Verify Installation
 ```bash
-# Workflow automation  
-"Create editor tools for level design"
-"Set up automated testing for my game systems"
-"Configure CI/CD pipeline for multi-platform builds"
-
-# Code quality
-"Review my combat system for Unity best practices"
-"Refactor this code following SOLID principles"
-"Add comprehensive unit tests for my game mechanics"
+claude /agents
+# Should show all 40+ Unity agents.
 ```
 
-### 📱 Platform-Specific
+### 3. Initialize Your Unity Project
+**Navigate** to your **Unity project directory** (where Assets/ folder is) and run:
+
 ```bash
-# Mobile development
-"Optimize touch controls for different screen sizes"
-"Implement IAP with receipt validation"
-"Add push notifications for daily rewards"
-
-# Console development  
-"Port my game to PlayStation 5 with DualSense features"
-"Optimize for Xbox Series X/S performance targets"
-"Handle Nintendo Switch sleep/wake scenarios"
+claude "use @unity-team-configurator and optimize my Unity project to best use the available subagents."
 ```
 
-## 🏆 Why Choose Unity Game Dev Agents?
+### 4. Start Building
+```bash
+claude "use @unity-tech-lead-orchestrator and create a player movement system with jumping"
+```
 
-### **🎯 Specialized Expertise**
-Each agent has deep domain knowledge:
-- **unity-physics-programmer** knows vehicle dynamics and constraints
-- **unity-mobile-developer** optimizes for battery life and thermal limits
-- **unity-vr-developer** handles motion sickness and comfort settings
+Your Unity AI team will automatically detect your Unity version, render pipeline, and use the right specialists!
 
-### **⚡ Proven Results**
-Teams using this system report:
-- **3x faster** feature development cycles
-- **75% fewer** performance issues at launch  
-- **90% better** code organization and maintainability
-- **50% less** technical debt accumulation
+## 🎯 How Auto-Configuration Works
 
-### **🔧 Production-Ready**
-- Based on shipped Unity games experience
-- Platform-specific optimization techniques
-- Scalable architecture from prototype to production
-- Automated testing and quality assurance patterns
+The @unity-team-configurator automatically sets up your perfect Unity development team. When invoked, it:
+
+1. **Locates CLAUDE.md** - Finds existing project configuration in your Unity project root
+2. **Detects Unity Stack** - Inspects Unity version, render pipeline (URP/HDRP/Built-in), platforms, and packages
+3. **Discovers Available Agents** - Scans ~/.claude/agents/ for Unity specialists
+4. **Selects Specialists** - Matches agents to your Unity setup (mobile, VR, multiplayer, etc.)
+5. **Updates CLAUDE.md** - Creates a Unity-specific "AI Team Configuration" section
+6. **Provides Usage Guidance** - Shows detected Unity setup and sample commands
+
+## 👥 Meet Your Unity AI Development Team
+
+### 🎭 Orchestrators (3 agents)
+- **[Unity Tech Lead Orchestrator](agents/orchestrators/unity-tech-lead-orchestrator.md)** - Senior Unity architect who coordinates complex game development tasks
+- **[Unity Project Analyst](agents/orchestrators/unity-project-analyst.md)** - Unity project analyzer for technology detection and optimization
+- **[Unity Team Configurator](agents/orchestrators/unity-team-configurator.md)** - AI team setup for Unity projects with automatic stack detection
+
+### 🎮 Core Development (6 agents)
+- **[Unity Performance Optimizer](agents/core/unity-performance-optimizer.md)** - Performance profiling, optimization, and platform-specific tuning
+- **[Unity Code Reviewer](agents/core/unity-code-reviewer.md)** - Unity-specific code review with best practices enforcement
+- **[Unity Build Engineer](agents/core/unity-build-engineer.md)** - Build pipelines, CI/CD, and multi-platform deployment
+- **[Unity QA Engineer](agents/core/unity-qa-engineer.md)** - Automated testing with Unity Test Framework
+- **[Unity Analytics Engineer](agents/core/unity-analytics-engineer.md)** - Game analytics, telemetry, and player behavior tracking
+- **[Unity Tools Programmer](agents/core/unity-tools-programmer.md)** - Editor tools, workflow automation, and productivity
+
+### 💼 Specialized Experts (28 agents)
+
+#### Gameplay Programming (4 agents)
+- **[Unity Gameplay Programmer](agents/specialized/gameplay/unity-gameplay-programmer.md)** - Core game mechanics and player systems
+- **[Unity Physics Programmer](agents/specialized/gameplay/unity-physics-programmer.md)** - Physics simulation, vehicles, and constraints
+- **[Unity AI Programmer](agents/specialized/gameplay/unity-ai-programmer.md)** - AI behavior, pathfinding, and decision systems
+- **[Unity Animation Programmer](agents/specialized/gameplay/unity-animation-programmer.md)** - Character animation, Timeline, and IK
+
+#### Graphics & Rendering (3 agents)
+- **[Unity Graphics Programmer](agents/specialized/graphics/unity-graphics-programmer.md)** - Rendering optimization and visual effects
+- **[Unity Shader Programmer](agents/specialized/graphics/unity-shader-programmer.md)** - Custom shader development with HLSL
+- **[Unity Technical Artist](agents/specialized/graphics/unity-technical-artist.md)** - Art pipeline and shader authoring
+
+#### Platform Development (6 agents)
+- **[Unity Mobile Developer](agents/specialized/mobile/unity-mobile-developer.md)** - iOS/Android optimization and features
+- **[Unity Console Developer](agents/platforms/unity-console-developer.md)** - PlayStation, Xbox, Nintendo Switch development
+- **[Unity Web Developer](agents/platforms/unity-web-developer.md)** - WebGL deployment and browser optimization
+- **[Unity VR Developer](agents/specialized/xr/unity-vr-developer.md)** - Virtual reality with XR Toolkit
+- **[Unity AR Developer](agents/specialized/xr/unity-ar-developer.md)** - Augmented reality with AR Foundation
+
+#### Networking & Infrastructure (2 agents)
+- **[Unity Multiplayer Engineer](agents/specialized/networking/unity-multiplayer-engineer.md)** - Netcode for GameObjects and networking
+- **[Unity Cloud Engineer](agents/specialized/cloud/unity-cloud-engineer.md)** - Unity Gaming Services and cloud infrastructure
+
+#### UI & User Experience (1 agent)
+- **[Unity UI Developer](agents/specialized/ui/unity-ui-developer.md)** - UI Toolkit and uGUI implementation
+
+#### Business & Monetization (1 agent)
+- **[Unity Monetization Specialist](agents/specialized/monetization/unity-monetization-specialist.md)** - IAP, ads, and ethical monetization
+
+#### Accessibility & Localization (2 agents)
+- **[Unity Localization Specialist](agents/specialized/localization/unity-localization-specialist.md)** - Multi-language support and cultural adaptation
+- **[Unity Accessibility Specialist](agents/specialized/accessibility/unity-accessibility-specialist.md)** - Inclusive game design features
+
+#### Audio (1 agent)
+- **[Unity Audio Engineer](agents/specialized/audio/unity-audio-engineer.md)** - 3D audio, music systems, and optimization
+
+#### Data & Security (2 agents)
+- **[Unity Data Engineer](agents/specialized/data/unity-data-engineer.md)** - Save systems, data persistence, and cloud sync
+- **[Unity Security Engineer](agents/specialized/security/unity-security-engineer.md)** - Anti-cheat, encryption, and security
+
+### 🌐 Universal Game Design (1 agent)
+- **[Game Designer](agents/universal/game-designer.md)** - Game mechanics, balance, and monetization design
+
+### 🛠️ Quality Assurance (4 agents)
+- **[Code Archaeologist](agents/core/code-archaeologist.md)** - Legacy code exploration and documentation
+- **[Code Reviewer](agents/core/code-reviewer.md)** - Comprehensive code quality assessment
+- **[Documentation Specialist](agents/core/documentation-specialist.md)** - Technical documentation and guides
+- **[Performance Optimizer](agents/core/performance-optimizer.md)** - System-wide performance analysis
+
+## 🚀 Example Workflows
+
+### Creating a Mobile Game
+```bash
+claude "use @unity-tech-lead-orchestrator to create a mobile puzzle game with touch controls"
+# Automatically routes to: @unity-mobile-developer, @unity-ui-developer, @unity-gameplay-programmer
+```
+
+### Optimizing Performance
+```bash
+claude "use @unity-performance-optimizer to analyze and fix framerate issues on mobile"
+# Deep performance analysis with platform-specific optimizations
+```
+
+### Multiplayer Implementation
+```bash
+claude "use @unity-multiplayer-engineer to add online multiplayer to my racing game"
+# Complete networking setup with Netcode for GameObjects
+```
+
+## 📊 Token Usage Guidelines
+
+Unity development workflows can be token-intensive:
+- **Simple features**: 5-10k tokens (player movement, UI screens)
+- **Complex systems**: 20-40k tokens (multiplayer, save systems)
+- **Full features**: 40-80k tokens (complete game mechanics with optimization)
+
+Tips to manage usage:
+1. Break large features into smaller tasks
+2. Use specific agents directly for focused work
+3. Let orchestrators handle only complex multi-system features
 
 ## 🤝 Contributing
 
-We welcome contributions! Here's how you can help:
+Want to add new Unity agents or improve existing ones? Check out our [Contributing Guide](CONTRIBUTING.md).
 
-- **🐛 Report Issues**: Found a bug or have a suggestion? [Open an issue](../../issues)
-- **🚀 Request Agents**: Need a specialist we don't have? [Request a new agent](../../issues/new?template=agent_request.yml)
-- **📖 Improve Docs**: Help make our documentation even better
-- **🛠️ Submit Agents**: Create new agents following our [contribution guide](./CONTRIBUTING.md)
+### Adding New Agents
+1. Create agent file in appropriate category
+2. Follow the YAML frontmatter format
+3. Include Unity 6000.1 code examples
+4. Submit PR with clear description
 
-## 📊 Project Status
+## 📚 Documentation
 
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/the1-unity-claude-agents/unity-game-dev-agents)
-![GitHub](https://img.shields.io/github/license/the1-unity-claude-agents/unity-game-dev-agents)
-![Unity Version](https://img.shields.io/badge/Unity-6000.1%2B-green)
-![Claude Code](https://img.shields.io/badge/Claude%20Code-Compatible-blue)
+- **[Creating Agents](docs/creating-agents.md)** - Guide for creating new Unity agents
+- **[Best Practices](docs/best-practices.md)** - Unity development best practices
+- **[Example Workflows](docs/example-workflows.md)** - Common Unity development scenarios
 
-- **🎯 40+ Specialized Agents** ready for production use
-- **📱 Multi-Platform Support** (Mobile, Console, Web, XR)
-- **🔄 Active Development** with regular updates
-- **🤝 Community Driven** with contributions welcome
+## 🔧 Troubleshooting
+
+### "Agent not found"
+- Verify installation path: `ls ~/.claude/`
+- Check agent names: `claude /agents | grep unity`
+- Ensure proper symlink/copy
+
+### "High token usage"
+- Use specific agents instead of orchestrators for simple tasks
+- Break complex features into smaller chunks
+- Monitor usage with Claude's token counter
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details.
+MIT License - Use freely in personal and commercial projects.
 
 ## 🙏 Acknowledgments
 
+- **Anthropic** for Claude Code and the agent system
 - **Unity Technologies** for the amazing game engine
-- **Anthropic** for Claude Code and AI agent capabilities  
 - **awesome-claude-agents** for the project structure inspiration
-- **Unity Community** for feedback and contributions
+- The Unity development community
 
 ---
 
 <div align="center">
 
-**🎮 Ready to revolutionize your Unity development?**
+**Built with ❤️ for Unity developers**
 
-[**Get Started**](#-quick-start) • [**View Agents**](./unity-game-dev-agents/README.md) • [**Documentation**](./unity-game-dev-agents/docs/) • [**Contribute**](./CONTRIBUTING.md)
-
-*Built with ❤️ for the Unity developer community*
+[Report Issues](https://github.com/The1Studio/the1-unity-claude-agents/issues) • [Request Features](https://github.com/The1Studio/the1-unity-claude-agents/issues/new) • [Join Discussion](https://github.com/The1Studio/the1-unity-claude-agents/discussions)
 
 </div>
