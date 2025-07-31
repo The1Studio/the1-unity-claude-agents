@@ -1,0 +1,164 @@
+name: New Agent Request
+description: Request a new Unity development agent
+title: "[AGENT REQUEST] "
+labels: ["new-agent", "enhancement"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for requesting a new Unity agent! Please provide detailed information about the agent you'd like to see.
+
+  - type: input
+    id: agent-name
+    attributes:
+      label: Proposed Agent Name
+      description: What would you like to call this agent?
+      placeholder: "unity-vr-specialist"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: agent-category
+    attributes:
+      label: Agent Category
+      description: Which category would this agent belong to?
+      options:
+        - Core Development (fundamental Unity development)
+        - Specialized (specific domain expertise) 
+        - Platform (platform-specific development)
+        - Universal (cross-cutting concerns)
+    validations:
+      required: true
+
+  - type: textarea
+    id: domain-expertise
+    attributes:
+      label: Domain Expertise
+      description: What specific area of Unity development would this agent specialize in?
+      placeholder: "Virtual Reality development, XR interactions, spatial audio, hand tracking..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: use-cases
+    attributes:
+      label: Primary Use Cases
+      description: What specific tasks would this agent help developers with?
+      placeholder: |
+        - Setting up VR camera rigs
+        - Implementing hand tracking systems
+        - Optimizing VR performance
+        - Creating spatial UI interfaces
+    validations:
+      required: true
+
+  - type: textarea
+    id: code-examples
+    attributes:
+      label: Expected Code Examples
+      description: What types of code should this agent be able to generate?
+      placeholder: |
+        - VR controller input handling
+        - Teleportation systems
+        - Grab and interaction mechanics
+        - Performance optimization for VR
+
+  - type: textarea
+    id: integration-points
+    attributes:
+      label: Integration with Other Agents
+      description: How would this agent work with existing agents?
+      placeholder: |
+        - Would delegate performance optimization to unity-performance-optimizer
+        - Would work with unity-audio-engineer for spatial audio
+        - Would integrate with unity-ui-ux-designer for VR interfaces
+
+  - type: dropdown
+    id: unity-packages
+    attributes:
+      label: Related Unity Packages
+      description: Which Unity packages or APIs would this agent primarily work with?
+      multiple: true
+      options:
+        - XR Interaction Toolkit
+        - AR Foundation
+        - Universal Render Pipeline (URP)
+        - High Definition Render Pipeline (HDRP)
+        - Unity Analytics
+        - Unity Cloud Build
+        - Addressable Assets
+        - Timeline
+        - Cinemachine
+        - Input System
+        - Netcode for GameObjects
+        - Other/Custom
+
+  - type: textarea
+    id: target-platforms
+    attributes:
+      label: Target Platforms
+      description: Which platforms would this agent primarily target?
+      placeholder: "Oculus/Meta Quest, HTC Vive, PlayStation VR, Mobile AR, HoloLens..."
+
+  - type: dropdown
+    id: priority-justification
+    attributes:
+      label: Priority Justification
+      description: Why is this agent needed now?
+      options:
+        - High demand from Unity community
+        - Emerging technology/platform
+        - Gap in current agent coverage
+        - Personal/team need
+        - Market opportunity
+    validations:
+      required: true
+
+  - type: textarea
+    id: existing-solutions
+    attributes:
+      label: Current Solutions and Limitations
+      description: What tools/approaches do developers currently use, and what are their limitations?
+      placeholder: "Developers currently use manual setup with XR Toolkit, but it's complex and error-prone..."
+
+  - type: textarea
+    id: success-criteria
+    attributes:
+      label: Success Criteria
+      description: How would we know this agent is successful?
+      placeholder: |
+        - Reduces VR setup time from hours to minutes
+        - Generates production-ready VR interaction code
+        - Handles common VR performance optimizations automatically
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Any other information that would help in creating this agent?
+      placeholder: "Links to documentation, tutorials, or examples of the type of code this agent should generate..."
+
+  - type: checkboxes
+    id: contribution-willingness
+    attributes:
+      label: Contribution
+      description: Would you be willing to contribute to creating this agent?
+      options:
+        - label: I would help design the agent's capabilities
+        - label: I would help write example code and implementations
+        - label: I would help test the agent with real-world scenarios
+        - label: I would help write documentation
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      options:
+        - label: I have searched for existing agents that might cover this domain
+          required: true
+        - label: I have provided specific use cases and examples
+          required: true
+        - label: I have considered how this agent fits into the existing ecosystem
+          required: true

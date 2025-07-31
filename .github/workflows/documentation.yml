@@ -1,0 +1,369 @@
+name: Documentation
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'unity-game-dev-agents/**/*.md'
+      - 'docs/**'
+      - 'README.md'
+      - '.github/workflows/documentation.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'unity-game-dev-agents/**/*.md'
+      - 'docs/**'
+      - 'README.md'
+
+jobs:
+  lint-markdown:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+
+    - name: Install markdownlint
+      run: npm install -g markdownlint-cli
+
+    - name: Create markdownlint config
+      run: |
+        cat > .markdownlint.json << EOF
+        {
+          "MD013": {
+            "line_length": 120,
+            "tables": false,
+            "code_blocks": false
+          },
+          "MD033": {
+            "allowed_elements": ["img", "br", "sub", "sup"]
+          },
+          "MD041": false
+        }
+        EOF
+
+    - name: Lint Markdown files
+      run: |
+        markdownlint "**/*.md" --ignore node_modules --ignore .github || true
+        echo "Markdown linting completed (warnings only)"
+
+  check-links:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+
+    - name: Install markdown-link-check
+      run: npm install -g markdown-link-check
+
+    - name: Create link check config
+      run: |
+        cat > .markdown-link-check.json << EOF
+        {
+          "ignorePatterns": [
+            {
+              "pattern": "^http://localhost"
+            },
+            {
+              "pattern": "^https://localhost"
+            },
+            {
+              "pattern": "^file://"
+            }
+          ],
+          "timeout": "10s",
+          "retryOn429": true,
+          "retryCount": 3,
+          "fallbackRetryDelay": "30s",
+          "aliveStatusCodes": [200, 206]
+        }
+        EOF
+
+    - name: Check links in documentation
+      run: |
+        find . -name "*.md" -not -path "./node_modules/*" -not -path "./.git/*" | \
+        xargs -I {} markdown-link-check {} --config .markdown-link-check.json || true
+        echo "Link checking completed (warnings only)"
+
+  generate-agent-index:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: Generate agent index
+      run: |
+        python -c "
+        import os
+        import yaml
+        import json
+        from pathlib import Path
+        
+        agents = {}
+        categories = {}
+        
+        for root, dirs, files in os.walk('unity-game-dev-agents/agents'):
+            for file in files:
+                if file.endswith('.md'):
+                    file_path = os.path.join(root, file)
+                    relative_path = os.path.relpath(file_path)
+                    
+                    with open(file_path, 'r', encoding='utf-8') as f:
+                        content = f.read()
+                    
+                    if content.startswith('---'):
+                        try:
+                            parts = content.split('---', 2)
+                            frontmatter = yaml.safe_load(parts[1])
+                            
+                            category = os.path.dirname(relative_path).split('/')[-1]
+                            
+                            agent_info = {
+                                'role': frontmatter.get('role', ''),
+                                'description': frontmatter.get('description', ''),
+                                'category': category,
+                                'file_path': relative_path,
+                                'core_expertise': frontmatter.get('core_expertise', []),
+                                'routing_examples': frontmatter.get('routing_examples', [])
+                            }
+                            
+                            agents[frontmatter.get('role', '')] = agent_info
+                            
+                            if category not in categories:
+                                categories[category] = []
+                            categories[category].append(frontmatter.get('role', ''))
+                            
+                        except Exception as e:
+                            print(f'Error processing {file_path}: {e}')
+        
+        # Generate JSON index
+        index_data = {
+            'agents': agents,
+            'categories': categories,
+            'total_agents': len(agents),
+            'generated_at': '$(date -u +%Y-%m-%dT%H:%M:%SZ)'
+        }
+        
+        with open('unity-game-dev-agents/agent-index.json', 'w') as f:
+            json.dump(index_data, f, indent=2)
+        
+        print(f'Generated index for {len(agents)} agents across {len(categories)} categories')
+        "
+
+    - name: Generate agent directory markdown
+      run: |
+        python -c "
+        import os
+        import yaml
+        import json
+        from collections import defaultdict
+        
+        def generate_directory_md():
+            content = []
+            content.append('# Unity Game Dev Agents Directory')
+            content.append('')
+            content.append('This directory is automatically generated and contains all available Unity development agents.')
+            content.append('')
+            
+            # Load agent data
+            agents_by_category = defaultdict(list)
+            total_agents = 0
+            
+            for root, dirs, files in os.walk('unity-game-dev-agents/agents'):
+                for file in files:
+                    if file.endswith('.md'):
+                        file_path = os.path.join(root, file)
+                        relative_path = os.path.relpath(file_path)
+                        
+                        with open(file_path, 'r', encoding='utf-8') as f:
+                            file_content = f.read()
+                        
+                        if file_content.startswith('---'):
+                            try:
+                                parts = file_content.split('---', 2)
+                                frontmatter = yaml.safe_load(parts[1])
+                                
+                                category = os.path.dirname(relative_path).split('/')[-1]
+                                role = frontmatter.get('role', '')
+                                description = frontmatter.get('description', '').strip()
+                                
+                                # Clean up description for display
+                                if description:
+                                    description = ' '.join(description.split())
+                                    if len(description) > 150:
+                                        description = description[:147] + '...'
+                                
+                                agents_by_category[category].append({
+                                    'role': role,
+                                    'description': description,
+                                    'file_path': relative_path
+                                })
+                                total_agents += 1
+                                
+                            except Exception as e:
+                                print(f'Error processing {file_path}: {e}')
+            
+            content.append(f'**Total Agents:** {total_agents}')
+            content.append('')
+            
+            # Category descriptions
+            category_descriptions = {
+                'core': 'Fundamental Unity development agents for essential game development tasks',
+                'specialized': 'Domain-specific agents for specialized Unity development areas',
+                'platforms': 'Platform-specific agents for console, mobile, and web development',
+                'universal': 'Cross-cutting agents that work across multiple domains'
+            }
+            
+            # Generate table of contents
+            content.append('## Categories')
+            content.append('')
+            for category in sorted(agents_by_category.keys()):
+                count = len(agents_by_category[category])
+                desc = category_descriptions.get(category, f'{category.title()} development agents')
+                content.append(f'- [{category.title()}](#{category}) ({count} agents) - {desc}')
+            content.append('')
+            
+            # Generate agent listings by category
+            for category in sorted(agents_by_category.keys()):
+                agents = sorted(agents_by_category[category], key=lambda x: x['role'])
+                
+                content.append(f'## {category.title()}')
+                content.append('')
+                
+                if category in category_descriptions:
+                    content.append(category_descriptions[category])
+                    content.append('')
+                
+                for agent in agents:
+                    content.append(f'### [{agent[\"role\"]}]({agent[\"file_path\"]})')
+                    if agent['description']:
+                        content.append(f'{agent[\"description\"]}')
+                    content.append('')
+            
+            return '\\n'.join(content)
+        
+        directory_content = generate_directory_md()
+        with open('unity-game-dev-agents/AGENT_DIRECTORY.md', 'w') as f:
+            f.write(directory_content)
+        
+        print('Generated AGENT_DIRECTORY.md')
+        "
+
+    - name: Commit generated files
+      if: github.event_name == 'push'
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        
+        if [[ -n $(git status --porcelain) ]]; then
+          git add unity-game-dev-agents/agent-index.json
+          git add unity-game-dev-agents/AGENT_DIRECTORY.md
+          git commit -m "Auto-update agent index and directory [skip ci]"
+          git push
+        else
+          echo "No changes to commit"
+        fi
+
+  spell-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install aspell
+      run: sudo apt-get update && sudo apt-get install -y aspell aspell-en
+
+    - name: Create custom dictionary
+      run: |
+        cat > .aspell.en.pws << EOF
+        personal_ws-1.1 en 200
+        APIs
+        GameObject
+        MonoBehaviour
+        ScriptableObject
+        GameObject's
+        prefab
+        prefabs
+        serialized
+        coroutine
+        coroutines
+        async
+        await
+        nullable
+        gameplay
+        multiplatform
+        multithreaded
+        backend
+        frontend
+        URP
+        HDRP
+        WebGL
+        DevOps
+        CI/CD
+        IAP
+        monetization
+        analytics
+        telemetry
+        SDK
+        SDKs
+        API
+        UI
+        UX
+        VR
+        AR
+        XR
+        3D
+        2D
+        framerate
+        FPS
+        LOD
+        culling
+        batching
+        occlusion
+        lightmapping
+        baking
+        shader
+        shaders
+        HLSL
+        GPU
+        CPU
+        RAM
+        SSD
+        HDD
+        iOS
+        Android
+        PlayStation
+        Xbox
+        Nintendo
+        macOS
+        Windows
+        Linux
+        EOF
+
+    - name: Spell check documentation
+      run: |
+        find . -name "*.md" -not -path "./node_modules/*" -not -path "./.git/*" | \
+        while read file; do
+          echo "Checking $file"
+          aspell --personal=./.aspell.en.pws --lang=en --mode=markdown check "$file" || true
+        done
+        echo "Spell checking completed (informational only)"

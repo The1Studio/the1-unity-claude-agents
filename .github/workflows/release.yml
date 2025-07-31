@@ -1,0 +1,258 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g., v1.0.0)'
+        required: true
+        type: string
+
+jobs:
+  validate-release:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Validate tag format
+      if: github.event_name == 'push'
+      run: |
+        TAG=${GITHUB_REF#refs/tags/}
+        if [[ ! $TAG =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9]+)?$ ]]; then
+          echo "❌ Invalid tag format: $TAG"
+          echo "Expected format: v1.0.0 or v1.0.0-beta"
+          exit 1
+        fi
+        echo "✅ Valid tag format: $TAG"
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: Validate all agents
+      run: |
+        python -c "
+        import os
+        import yaml
+        import sys
+        
+        errors = 0
+        
+        for root, dirs, files in os.walk('unity-game-dev-agents/agents'):
+            for file in files:
+                if file.endswith('.md'):
+                    file_path = os.path.join(root, file)
+                    
+                    with open(file_path, 'r', encoding='utf-8') as f:
+                        content = f.read()
+                    
+                    if not content.startswith('---'):
+                        print(f'❌ {file_path}: Missing YAML frontmatter')
+                        errors += 1
+                        continue
+                    
+                    try:
+                        parts = content.split('---', 2)
+                        frontmatter = yaml.safe_load(parts[1])
+                        
+                        required_fields = ['role', 'description', 'model_usage']
+                        for field in required_fields:
+                            if field not in frontmatter:
+                                print(f'❌ {file_path}: Missing {field}')
+                                errors += 1
+                        
+                    except yaml.YAMLError as e:
+                        print(f'❌ {file_path}: YAML error: {e}')
+                        errors += 1
+        
+        if errors > 0:
+            print(f'\\n❌ {errors} validation errors found')
+            sys.exit(1)
+        else:
+            print('✅ All agents validated successfully')
+        "
+
+  create-release:
+    needs: validate-release
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Set release version
+      id: version
+      run: |
+        if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+          VERSION="${{ github.event.inputs.version }}"
+        else
+          VERSION=${GITHUB_REF#refs/tags/}
+        fi
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "clean_version=${VERSION#v}" >> $GITHUB_OUTPUT
+
+    - name: Generate release notes
+      id: release-notes
+      run: |
+        VERSION="${{ steps.version.outputs.version }}"
+        
+        # Get the previous tag
+        PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD~1 2>/dev/null || echo "")
+        
+        echo "# Unity Game Dev Agents $VERSION" > release_notes.md
+        echo "" >> release_notes.md
+        
+        # Count agents
+        AGENT_COUNT=$(find unity-game-dev-agents/agents -name "*.md" | wc -l)
+        echo "🎯 **$AGENT_COUNT Unity development agents** ready to accelerate your game development!" >> release_notes.md
+        echo "" >> release_notes.md
+        
+        # Agent categories summary
+        echo "## 📋 Agent Categories" >> release_notes.md
+        echo "" >> release_notes.md
+        
+        for category in unity-game-dev-agents/agents/*/; do
+          if [[ -d "$category" ]]; then
+            category_name=$(basename "$category")
+            agent_count=$(find "$category" -name "*.md" | wc -l)
+            echo "- **${category_name^}**: $agent_count agents" >> release_notes.md
+          fi
+        done
+        echo "" >> release_notes.md
+        
+        # What's new section
+        echo "## 🆕 What's New" >> release_notes.md
+        echo "" >> release_notes.md
+        
+        if [[ -n "$PREVIOUS_TAG" ]]; then
+          # Get commits since last tag
+          echo "### Changes since $PREVIOUS_TAG" >> release_notes.md
+          echo "" >> release_notes.md
+          
+          git log --pretty=format:"- %s" "$PREVIOUS_TAG"..HEAD | grep -E "(feat|fix|add|update|improve)" >> release_notes.md || echo "- Various improvements and updates" >> release_notes.md
+        else
+          echo "- Initial release of Unity Game Dev Agents collection" >> release_notes.md
+          echo "- Complete set of specialized AI agents for Unity development" >> release_notes.md
+          echo "- Comprehensive documentation and examples" >> release_notes.md
+          echo "- Ready-to-use agent configurations for Claude Code" >> release_notes.md
+        fi
+        
+        echo "" >> release_notes.md
+        
+        # Getting started section
+        echo "## 🚀 Getting Started" >> release_notes.md
+        echo "" >> release_notes.md
+        echo "1. Clone this repository or download the release archive" >> release_notes.md
+        echo "2. Follow the setup instructions in the README" >> release_notes.md
+        echo "3. Import agents into your Claude Code environment" >> release_notes.md
+        echo "4. Start building amazing Unity games with AI assistance!" >> release_notes.md
+        echo "" >> release_notes.md
+        
+        # Documentation links
+        echo "## 📚 Documentation" >> release_notes.md
+        echo "" >> release_notes.md
+        echo "- [Setup Guide](./README.md#setup)" >> release_notes.md
+        echo "- [Agent Directory](./unity-game-dev-agents/AGENT_DIRECTORY.md)" >> release_notes.md
+        echo "- [Best Practices](./unity-game-dev-agents/docs/best-practices.md)" >> release_notes.md
+        echo "- [Contributing](./CONTRIBUTING.md)" >> release_notes.md
+        echo "" >> release_notes.md
+        
+        # System requirements
+        echo "## 💻 Requirements" >> release_notes.md
+        echo "" >> release_notes.md
+        echo "- Claude Code CLI" >> release_notes.md
+        echo "- Unity 2022.3 LTS or later (Unity 6000.1+ recommended)" >> release_notes.md
+        echo "- Basic familiarity with Unity development" >> release_notes.md
+        echo "" >> release_notes.md
+        
+        echo "## 🤝 Contributing" >> release_notes.md
+        echo "" >> release_notes.md
+        echo "We welcome contributions! Please see our [Contributing Guidelines](./CONTRIBUTING.md) for details." >> release_notes.md
+
+    - name: Create release archive
+      run: |
+        VERSION="${{ steps.version.outputs.clean_version }}"
+        
+        # Create release directory
+        mkdir -p "unity-game-dev-agents-$VERSION"
+        
+        # Copy all necessary files
+        cp -r unity-game-dev-agents "unity-game-dev-agents-$VERSION/"
+        cp README.md "unity-game-dev-agents-$VERSION/"
+        cp CONTRIBUTING.md "unity-game-dev-agents-$VERSION/"
+        cp LICENSE "unity-game-dev-agents-$VERSION/"
+        
+        # Create archive
+        tar -czf "unity-game-dev-agents-$VERSION.tar.gz" "unity-game-dev-agents-$VERSION"
+        zip -r "unity-game-dev-agents-$VERSION.zip" "unity-game-dev-agents-$VERSION"
+        
+        # Generate checksums
+        sha256sum "unity-game-dev-agents-$VERSION.tar.gz" > "unity-game-dev-agents-$VERSION.tar.gz.sha256"
+        sha256sum "unity-game-dev-agents-$VERSION.zip" > "unity-game-dev-agents-$VERSION.zip.sha256"
+
+    - name: Create GitHub Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.version.outputs.version }}
+        release_name: Unity Game Dev Agents ${{ steps.version.outputs.version }}
+        body_path: release_notes.md
+        draft: false
+        prerelease: ${{ contains(steps.version.outputs.version, '-') }}
+
+    - name: Upload release assets
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./unity-game-dev-agents-${{ steps.version.outputs.clean_version }}.tar.gz
+        asset_name: unity-game-dev-agents-${{ steps.version.outputs.clean_version }}.tar.gz
+        asset_content_type: application/gzip
+
+    - name: Upload release assets (zip)
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./unity-game-dev-agents-${{ steps.version.outputs.clean_version }}.zip
+        asset_name: unity-game-dev-agents-${{ steps.version.outputs.clean_version }}.zip
+        asset_content_type: application/zip
+
+    - name: Upload checksums
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./unity-game-dev-agents-${{ steps.version.outputs.clean_version }}.tar.gz.sha256
+        asset_name: unity-game-dev-agents-${{ steps.version.outputs.clean_version }}.tar.gz.sha256
+        asset_content_type: text/plain
+
+  notify-completion:
+    needs: create-release
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+    - name: Release status
+      run: |
+        if [[ "${{ needs.create-release.result }}" == "success" ]]; then
+          echo "✅ Release ${{ needs.create-release.outputs.version }} created successfully!"
+          echo "🎉 Unity Game Dev Agents are ready for download!"
+        else
+          echo "❌ Release creation failed"
+          exit 1
+        fi

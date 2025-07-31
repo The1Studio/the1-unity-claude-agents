@@ -1,0 +1,218 @@
+name: Validate Unity Agents
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths: 
+      - 'unity-game-dev-agents/agents/**/*.md'
+      - '.github/workflows/validate-agents.yml'
+  pull_request:
+    branches: [ main ]
+    paths: 
+      - 'unity-game-dev-agents/agents/**/*.md'
+
+jobs:
+  validate-agents:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pyyaml jsonschema requests
+
+    - name: Validate agent YAML frontmatter
+      run: |
+        python -c "
+        import os
+        import yaml
+        import sys
+        from pathlib import Path
+        
+        def validate_agent_file(file_path):
+            with open(file_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+            
+            if not content.startswith('---'):
+                print(f'❌ {file_path}: Missing YAML frontmatter')
+                return False
+            
+            try:
+                # Extract frontmatter
+                parts = content.split('---', 2)
+                if len(parts) < 3:
+                    print(f'❌ {file_path}: Invalid frontmatter format')
+                    return False
+                
+                frontmatter = yaml.safe_load(parts[1])
+                
+                # Required fields
+                required_fields = ['role', 'description', 'model_usage', 'routing_examples', 'core_expertise']
+                
+                for field in required_fields:
+                    if field not in frontmatter:
+                        print(f'❌ {file_path}: Missing required field: {field}')
+                        return False
+                
+                # Validate routing examples
+                if not isinstance(frontmatter['routing_examples'], list):
+                    print(f'❌ {file_path}: routing_examples must be a list')
+                    return False
+                
+                for example in frontmatter['routing_examples']:
+                    if not all(key in example for key in ['trigger', 'route_to', 'reason']):
+                        print(f'❌ {file_path}: Invalid routing example format')
+                        return False
+                
+                # Validate core expertise
+                if not isinstance(frontmatter['core_expertise'], list):
+                    print(f'❌ {file_path}: core_expertise must be a list')
+                    return False
+                
+                print(f'✅ {file_path}: Valid agent configuration')
+                return True
+                
+            except yaml.YAMLError as e:
+                print(f'❌ {file_path}: YAML parsing error: {e}')
+                return False
+        
+        agent_files = []
+        for root, dirs, files in os.walk('unity-game-dev-agents/agents'):
+            for file in files:
+                if file.endswith('.md'):
+                    agent_files.append(os.path.join(root, file))
+        
+        if not agent_files:
+            print('No agent files found')
+            sys.exit(0)
+        
+        valid_count = 0
+        for file_path in agent_files:
+            if validate_agent_file(file_path):
+                valid_count += 1
+        
+        print(f'\\n📊 Validation Summary: {valid_count}/{len(agent_files)} agents valid')
+        
+        if valid_count != len(agent_files):
+            sys.exit(1)
+        "
+
+    - name: Check for duplicate agent roles
+      run: |
+        python -c "
+        import os
+        import yaml
+        from collections import defaultdict
+        
+        roles = defaultdict(list)
+        
+        for root, dirs, files in os.walk('unity-game-dev-agents/agents'):
+            for file in files:
+                if file.endswith('.md'):
+                    file_path = os.path.join(root, file)
+                    with open(file_path, 'r', encoding='utf-8') as f:
+                        content = f.read()
+                    
+                    if content.startswith('---'):
+                        try:
+                            parts = content.split('---', 2)
+                            frontmatter = yaml.safe_load(parts[1])
+                            if 'role' in frontmatter:
+                                roles[frontmatter['role']].append(file_path)
+                        except:
+                            continue
+        
+        duplicates = {role: files for role, files in roles.items() if len(files) > 1}
+        
+        if duplicates:
+            print('❌ Duplicate agent roles found:')
+            for role, files in duplicates.items():
+                print(f'  Role \"{role}\" in: {files}')
+            exit(1)
+        else:
+            print('✅ No duplicate agent roles found')
+        "
+
+    - name: Validate markdown structure
+      run: |
+        python -c "
+        import os
+        import re
+        
+        def validate_markdown(file_path):
+            with open(file_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+            
+            issues = []
+            
+            # Check for required sections
+            required_sections = [
+                '# Unity.*',  # Main heading
+                '## Core Responsibilities',
+                '## Implementation Examples',
+                '## Best Practices',
+                '## Integration Points'
+            ]
+            
+            for section in required_sections:
+                if not re.search(section, content, re.IGNORECASE):
+                    issues.append(f'Missing section: {section}')
+            
+            # Check for code blocks in Implementation Examples
+            impl_section = re.search(r'## Implementation Examples.*?(?=## |$)', content, re.DOTALL)
+            if impl_section and '```csharp' not in impl_section.group():
+                issues.append('Implementation Examples section should contain C# code examples')
+            
+            if issues:
+                print(f'⚠️  {file_path}: {len(issues)} issue(s)')
+                for issue in issues:
+                    print(f'    - {issue}')
+                return False
+            else:
+                print(f'✅ {file_path}: Markdown structure valid')
+                return True
+        
+        agent_files = []
+        for root, dirs, files in os.walk('unity-game-dev-agents/agents'):
+            for file in files:
+                if file.endswith('.md'):
+                    agent_files.append(os.path.join(root, file))
+        
+        valid_count = sum(1 for file_path in agent_files if validate_markdown(file_path))
+        print(f'\\n📊 Markdown Validation: {valid_count}/{len(agent_files)} agents have valid structure')
+        
+        # Don't fail the build for markdown issues, just warn
+        if valid_count != len(agent_files):
+            print('⚠️  Some agents have markdown structure issues (warnings only)')
+        "
+
+    - name: Generate validation report
+      if: always()
+      run: |
+        echo "## Agent Validation Report" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        AGENT_COUNT=$(find unity-game-dev-agents/agents -name "*.md" | wc -l)
+        echo "📊 **Total Agents:** $AGENT_COUNT" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        echo "### Agent Directory Structure" >> $GITHUB_STEP_SUMMARY
+        echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+        tree unity-game-dev-agents/agents -I "*.md" || find unity-game-dev-agents/agents -type d | sort
+        echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        echo "### Agents by Category" >> $GITHUB_STEP_SUMMARY
+        find unity-game-dev-agents/agents -name "*.md" | sort | while read file; do
+          category=$(dirname "$file" | sed 's|.*agents/||')
+          agent=$(basename "$file" .md)
+          echo "- **$category**: $agent" >> $GITHUB_STEP_SUMMARY
+        done

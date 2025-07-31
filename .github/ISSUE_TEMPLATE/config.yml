@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Unity Community Forum
+    url: https://forum.unity.com/
+    about: For general Unity development questions and community support
+  - name: Unity Documentation
+    url: https://docs.unity3d.com/
+    about: Official Unity documentation and API reference
+  - name: Claude Code Documentation
+    url: https://docs.anthropic.com/en/docs/claude-code
+    about: Documentation for Claude Code and AI agent development

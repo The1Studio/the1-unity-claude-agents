@@ -1,0 +1,116 @@
+name: Bug Report
+description: Report a bug with a Unity agent
+title: "[BUG] "
+labels: ["bug", "needs-triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report! Please provide as much detail as possible.
+
+  - type: dropdown
+    id: agent
+    attributes:
+      label: Affected Agent
+      description: Which Unity agent is experiencing the issue?
+      options:
+        - unity-game-architect
+        - unity-gameplay-programmer  
+        - unity-physics-engineer
+        - unity-animation-specialist
+        - unity-ui-ux-designer
+        - unity-rendering-engineer
+        - unity-performance-optimizer
+        - unity-network-programmer
+        - unity-audio-engineer
+        - unity-qa-engineer
+        - unity-analytics-engineer
+        - unity-tools-programmer
+        - unity-monetization-specialist
+        - unity-localization-specialist
+        - unity-accessibility-specialist
+        - unity-shader-programmer
+        - unity-data-engineer
+        - unity-security-engineer
+        - unity-console-developer
+        - unity-web-developer
+        - unity-cloud-engineer
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: unity-version
+    attributes:
+      label: Unity Version
+      description: What version of Unity are you using?
+      placeholder: "2023.3.0f1"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: A clear and concise description of what the bug is.
+      placeholder: "The agent fails to generate proper code when..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: Steps to reproduce the behavior
+      placeholder: |
+        1. Use the agent with prompt '...'
+        2. Execute the generated code
+        3. Observe the error
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What you expected to happen
+      placeholder: "The agent should generate working code that..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      description: What actually happened
+      placeholder: "Instead, the agent produced code that..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Error Logs
+      description: If applicable, add any error messages or console output
+      render: shell
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional Context
+      description: Add any other context about the problem here
+      placeholder: "Project setup, specific requirements, platform details..."
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      options:
+        - label: I have searched existing issues to ensure this is not a duplicate
+          required: true
+        - label: I have provided all the required information above
+          required: true
+        - label: I have tested this with the latest version of the agent
+          required: true

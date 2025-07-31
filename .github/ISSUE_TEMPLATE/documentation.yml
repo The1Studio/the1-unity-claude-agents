@@ -1,0 +1,128 @@
+name: Documentation Issue
+description: Report an issue with documentation or request documentation improvements
+title: "[DOCS] "
+labels: ["documentation", "needs-triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Help us improve our documentation! Please provide details about the documentation issue or improvement.
+
+  - type: dropdown
+    id: doc-type
+    attributes:
+      label: Documentation Type
+      description: What type of documentation is this about?
+      options:
+        - Agent documentation (specific agent .md file)
+        - README.md
+        - Getting started guide
+        - Best practices guide
+        - Contributing guidelines
+        - API reference
+        - Examples and tutorials
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: issue-type
+    attributes:
+      label: Issue Type
+      description: What kind of documentation issue is this?
+      options:
+        - Incorrect information
+        - Missing information
+        - Unclear explanation
+        - Broken links
+        - Formatting issues
+        - Outdated content
+        - New documentation needed
+        - Typo/grammar error
+    validations:
+      required: true
+
+  - type: input
+    id: specific-page
+    attributes:
+      label: Specific Page/Section
+      description: Which page or section is this about?
+      placeholder: "agents/core/unity-gameplay-programmer.md - Implementation Examples section"
+
+  - type: textarea
+    id: current-content
+    attributes:
+      label: Current Content (if applicable)
+      description: Quote the current documentation content that has issues
+      render: markdown
+
+  - type: textarea
+    id: issue-description
+    attributes:
+      label: Issue Description
+      description: Describe the problem with the current documentation
+      placeholder: "The example code doesn't compile because it's missing import statements..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: suggested-improvement
+    attributes:
+      label: Suggested Improvement
+      description: How should this be fixed or improved?
+      placeholder: "Add the missing import statements and update the example to use Unity 2023.3 APIs..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Any other context about this documentation issue?
+      placeholder: "This affects new Unity developers trying to follow the getting started guide..."
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How important is fixing this documentation issue?
+      options:
+        - Low - Minor improvement
+        - Medium - Affects user experience
+        - High - Blocks users from getting started
+        - Critical - Incorrect information that could cause problems
+
+  - type: dropdown
+    id: audience
+    attributes:
+      label: Target Audience
+      description: Who would benefit most from fixing this documentation?
+      options:
+        - Beginners to Unity
+        - Intermediate Unity developers
+        - Advanced Unity developers
+        - Contributors to this project
+        - All users
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution
+      options:
+        - label: I would be willing to help fix this documentation issue
+        - label: I can provide technical review of proposed changes
+        - label: I can test proposed documentation changes
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      options:
+        - label: I have checked that this documentation issue hasn't already been reported
+          required: true
+        - label: I have provided a clear description of the problem
+          required: true
+        - label: I have suggested a specific improvement where possible
+          required: true
