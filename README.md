@@ -23,12 +23,12 @@ git clone https://github.com/The1Studio/the1-unity-claude-agents.git
 
 **macOS/Linux:**
 ```bash
-ln -sf "$(pwd)/the1-unity-claude-agents" ~/.claude/the1-unity-claude-agents
+ln -sf "$(pwd)/the1-unity-claude-agents" ~/.claude/agents
 ```
 
 **Windows (PowerShell):**
 ```powershell
-cmd /c mklink /D "$env:USERPROFILE\.claude\the1-unity-claude-agents" "$(Get-Location)\the1-unity-claude-agents"
+cmd /c mklink /D "$env:USERPROFILE\.claude\agents" "$(Get-Location)\the1-unity-claude-agents"
 ```
 
 #### Option B: Copy (Static - no auto-updates)
